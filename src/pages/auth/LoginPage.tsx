@@ -44,7 +44,10 @@ const LoginPage: React.FC = () => {
     }
   }, [error]);
 
-  const logoSrc = useMemo(() => '/icons/icon-192x192.png', []);
+  const logoSrc = useMemo(
+    () => `${import.meta.env.BASE_URL}icons/icon-192x192.png`,
+    []
+  );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -161,4 +164,3 @@ const LoginPage: React.FC = () => {
 };
 
 export default LoginPage;
-

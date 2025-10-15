@@ -55,6 +55,7 @@ import './theme/variables.css';
 
 const baseFromEnv = import.meta.env.BASE_URL.replace(/\/$/, '');
 const routerBasename = baseFromEnv.length > 0 ? baseFromEnv : undefined;
+const buildHref = (path: string) => `${routerBasename ?? ''}${path}`;
 
 setupIonicReact();
 
@@ -86,21 +87,21 @@ const Tabs: React.FC = () => (
     </IonRouterOutlet>
 
     <IonTabBar slot="bottom">
-      <IonTabButton tab="dashboard" routerLink="/app/dashboard">
+      <IonTabButton tab="dashboard" href={buildHref('/app/dashboard')}>
         <IonIcon aria-hidden="true" icon={homeOutline} />
         <IonLabel>Dashboard</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="applications" routerLink="/app/applications">
+      <IonTabButton tab="applications" href={buildHref('/app/applications')}>
         <IonIcon aria-hidden="true" icon={appsOutline} />
-        <IonLabel>Ứng dụng</IonLabel>
+        <IonLabel>Ung dung</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="notifications" routerLink="/app/notifications">
+      <IonTabButton tab="notifications" href={buildHref('/app/notifications')}>
         <IonIcon aria-hidden="true" icon={notificationsOutline} />
-        <IonLabel>Thông báo</IonLabel>
+        <IonLabel>Thong bao</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="profile" routerLink="/app/profile">
+      <IonTabButton tab="profile" href={buildHref('/app/profile')}>
         <IonIcon aria-hidden="true" icon={personOutline} />
-        <IonLabel>Cá nhân</IonLabel>
+        <IonLabel>Ca nhan</IonLabel>
       </IonTabButton>
     </IonTabBar>
   </IonTabs>
