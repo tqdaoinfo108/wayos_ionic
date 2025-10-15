@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-
-# PWA service worker is allowed
-User-agent: *
-Disallow:
-
