@@ -107,7 +107,7 @@ const ApplicationsPage: React.FC = () => {
           <IonGrid className="quick-actions-grid">
             <IonRow>
               {quickActions.map((action) => (
-                <IonCol size="12" sizeMd="6" sizeLg="3" key={action.title}>
+                <IonCol size="6" sizeMd="6" sizeLg="3" key={action.title}>
                   <IonCard
                     button
                     className="quick-action-card"

@@ -177,98 +177,193 @@ const RequestsPage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar color="primary">
-          <IonTitle>Yêu cầu</IonTitle>
+          <IonTitle>Quy trình</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className="ion-padding">
+      <IonContent fullscreen style={{ '--background': '#f8fafc' }}>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Yêu cầu</IonTitle>
+            <IonTitle size="large">Quy trình</IonTitle>
           </IonToolbar>
         </IonHeader>
 
-        <IonSearchbar
-          value={searchText}
-          onIonChange={handleSearchChange}
-          debounce={0}
-          placeholder="Tìm kiếm"
-        />
+        <div className="ion-padding" style={{ paddingBottom: '80px', maxWidth: '1200px', margin: '0 auto' }}>
+          <IonSearchbar
+            value={searchText}
+            onIonChange={handleSearchChange}
+            debounce={0}
+            placeholder="Tìm kiếm yêu cầu..."
+            style={{
+              '--background': '#ffffff',
+              '--border-radius': '12px',
+              '--box-shadow': '0 2px 8px rgba(15, 23, 42, 0.04)',
+              padding: '0',
+              marginBottom: '16px'
+            }}
+          />
 
-        <IonSegment
-          value={mode}
-          className="ion-margin-top"
-          onIonChange={(event) => setMode(event.detail.value as RequestMode)}
-        >
-          <IonSegmentButton value="processing">
-            <IonLabel>Quy trình</IonLabel>
-          </IonSegmentButton>
-          <IonSegmentButton value="handling">
-            <IonLabel>Công việc</IonLabel>
-          </IonSegmentButton>
-        </IonSegment>
-
-        <IonItem className="ion-margin-top">
-          <IonLabel>Trạng thái</IonLabel>
-          <IonSelect
-            value={status}
-            interface="popover"
-            onIonChange={(event) => setStatus(Number(event.detail.value))}
+          <IonSegment
+            value={mode}
+            onIonChange={(event) => setMode(event.detail.value as RequestMode)}
+            style={{
+              '--background': '#ffffff',
+              borderRadius: '12px',
+              padding: '4px',
+              marginBottom: '16px',
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)'
+            }}
           >
-            {statusOptions.map((option) => (
-              <IonSelectOption key={option.value} value={option.value}>
-                {option.label}
-              </IonSelectOption>
-            ))}
-          </IonSelect>
-        </IonItem>
+            <IonSegmentButton value="processing">
+              <IonLabel style={{ fontWeight: '600', fontSize: '14px' }}>Quy trình</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="handling">
+              <IonLabel style={{ fontWeight: '600', fontSize: '14px' }}>Công việc</IonLabel>
+            </IonSegmentButton>
+          </IonSegment>
 
-        {loading ? (
-          <div className="ion-padding ion-text-center">
-            <IonSpinner />
-          </div>
-        ) : error ? (
-          <IonText color="danger">
-            <p className="ion-padding">{error}</p>
-          </IonText>
-        ) : items.length === 0 ? (
-          <IonText color="medium">
-            <p className="ion-padding">Không có dữ liệu phù hợp.</p>
-          </IonText>
-        ) : (
-          <IonList>
-            {items.map((item) => {
-              const statusLabel =
-                mode === 'processing'
-                  ? getWorkflowStatusLabel(item.StatusID ?? 0)
-                  : getWorkHandlingStatusLabel(item.StatusID ?? 0);
-              const statusColor =
-                mode === 'processing'
-                  ? getWorkflowStatusColor(item.StatusID ?? 0)
-                  : getWorkHandlingStatusColor(item.StatusID ?? 0);
+          <IonItem 
+            lines="none"
+            style={{
+              '--background': '#f8fafc',
+              '--padding-start': '16px',
+              '--inner-padding-end': '16px',
+              borderRadius: '12px',
+              marginBottom: '16px',
+              border: '1px solid #e2e8f0'
+            }}
+          >
+            <IonLabel style={{ 
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#0f172a'
+            }}>
+              Trạng thái
+            </IonLabel>
+            <IonSelect
+              value={status}
+              interface="popover"
+              onIonChange={(event) => setStatus(Number(event.detail.value))}
+              style={{ fontWeight: '500' }}
+            >
+              {statusOptions.map((option) => (
+                <IonSelectOption key={option.value} value={option.value}>
+                  {option.label}
+                </IonSelectOption>
+              ))}
+            </IonSelect>
+          </IonItem>
 
-              return (
-                <IonItem
-                  key={`${mode}-${item.WorkFlowID ?? item.ProcessID ?? Math.random()}`}
-                  button
-                  detail
-                  onClick={() => handleNavigate(item)}
-                >
-                  <IonLabel>
-                    <h3>{item.Title ?? 'Không có tiêu đề'}</h3>
-                    <p>Ngày tạo: {formatDate(item.DateCreated)}</p>
-                    <p>
-                      Người đề xuất:{' '}
-                      {item.UserRequirementName ?? item.UserPostName ?? 'Không rõ'}
-                    </p>
-                    <p>
-                      <IonText style={{ color: statusColor }}>{statusLabel}</IonText>
-                    </p>
-                  </IonLabel>
-                </IonItem>
-              );
-            })}
-          </IonList>
-        )}
+          {loading ? (
+            <div className="ion-padding ion-text-center" style={{ marginTop: '60px' }}>
+              <IonSpinner color="primary" />
+              <p style={{ marginTop: '16px', color: '#64748b', fontSize: '14px' }}>
+                Đang tải...
+              </p>
+            </div>
+          ) : error ? (
+            <div style={{
+              background: '#fee',
+              border: '1px solid #fcc',
+              borderRadius: '12px',
+              padding: '20px',
+              textAlign: 'center',
+              marginTop: '20px'
+            }}>
+              <IonText color="danger">
+                <p style={{ margin: 0, fontSize: '14px' }}>{error}</p>
+              </IonText>
+            </div>
+          ) : items.length === 0 ? (
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '40px 20px',
+              textAlign: 'center',
+              marginTop: '20px',
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)'
+            }}>
+              <IonText color="medium">
+                <p style={{ margin: 0, fontSize: '14px' }}>Không có dữ liệu phù hợp.</p>
+              </IonText>
+            </div>
+          ) : (
+            <div style={{
+              background: '#ffffff',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)'
+            }}>
+              <IonList style={{ background: 'transparent' }}>
+                {items.map((item, index) => {
+                  const statusLabel =
+                    mode === 'processing'
+                      ? getWorkflowStatusLabel(item.StatusID ?? 0)
+                      : getWorkHandlingStatusLabel(item.StatusID ?? 0);
+                  const statusColor =
+                    mode === 'processing'
+                      ? getWorkflowStatusColor(item.StatusID ?? 0)
+                      : getWorkHandlingStatusColor(item.StatusID ?? 0);
+
+                  return (
+                    <IonItem
+                      key={`${mode}-${item.WorkFlowID ?? item.ProcessID ?? Math.random()}`}
+                      button
+                      detail
+                      onClick={() => handleNavigate(item)}
+                      lines={index < items.length - 1 ? 'full' : 'none'}
+                      style={{
+                        '--background': '#ffffff',
+                        '--border-color': '#e2e8f0',
+                        '--padding-start': '16px',
+                        '--inner-padding-end': '16px',
+                        '--min-height': '88px'
+                      }}
+                    >
+                      <IonLabel>
+                        <h3 style={{
+                          fontSize: '15px',
+                          fontWeight: '600',
+                          color: '#0f172a',
+                          margin: '0 0 8px',
+                          lineHeight: '1.4'
+                        }}>
+                          {item.Title ?? 'Không có tiêu đề'}
+                        </h3>
+                        <p style={{
+                          fontSize: '13px',
+                          color: '#64748b',
+                          margin: '0 0 4px'
+                        }}>
+                          Ngày tạo: {formatDate(item.DateCreated)}
+                        </p>
+                        <p style={{
+                          fontSize: '13px',
+                          color: '#64748b',
+                          margin: '0 0 6px'
+                        }}>
+                          {item.UserRequirementName ?? item.UserPostName ?? 'Không rõ'}
+                        </p>
+                        <div style={{
+                          display: 'inline-block',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          background: `${statusColor}20`,
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: statusColor
+                        }}>
+                          {statusLabel}
+                        </div>
+                      </IonLabel>
+                    </IonItem>
+                  );
+                })}
+              </IonList>
+            </div>
+          )}
+        </div>
       </IonContent>
     </IonPage>
   );

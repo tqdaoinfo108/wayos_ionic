@@ -57,53 +57,76 @@ const buildHref = (path: string): string => withBasePath(path);
 
 setupIonicReact();
 
-const Tabs: React.FC = () => (
-  <IonTabs>
-    <IonRouterOutlet>
-      <Route exact path="/app/dashboard" component={DashboardPage} />
-      <Route exact path="/app/applications" component={ApplicationsPage} />
-      <Route exact path="/app/notifications" component={NotificationsPage} />
-      <Route exact path="/app/profile" component={ProfilePage} />
-      <Route exact path="/app/requests" component={RequestsPage} />
-      <Route
-        exact
-        path="/app/requests/workflow/:workflowId/:statusId?"
-        component={WorkflowDetailPage}
-      />
-      <Route
-        exact
-        path="/app/requests/process/:processId"
-        component={ProcessDetailPage}
-      />
-      <Route exact path="/app/reports" component={ReportsPage} />
-      <Route exact path="/app/import-material" component={ImportMaterialPage} />
-      <Route exact path="/app/export-material" component={ExportMaterialPage} />
-      <Route exact path="/app/support" component={SupportPage} />
-      <Route exact path="/app">
-        <Redirect to="/app/dashboard" />
-      </Route>
-    </IonRouterOutlet>
+const Tabs: React.FC = () => {
+  console.log('Tabs component rendered');
+  return (
+    <IonTabs>
+      <IonRouterOutlet>
+        <Route exact path="/app/dashboard">
+          {() => {
+            console.log('Dashboard route matched');
+            return <DashboardPage />;
+          }}
+        </Route>
+        <Route exact path="/app/applications">
+          {() => {
+            console.log('Applications route matched');
+            return <ApplicationsPage />;
+          }}
+        </Route>
+        <Route exact path="/app/notifications">
+          {() => {
+            console.log('Notifications route matched');
+            return <NotificationsPage />;
+          }}
+        </Route>
+        <Route exact path="/app/profile">
+          {() => {
+            console.log('Profile route matched');
+            return <ProfilePage />;
+          }}
+        </Route>
+        <Route exact path="/app/requests" component={RequestsPage} />
+        <Route
+          exact
+          path="/app/requests/workflow/:workflowId/:statusId?"
+          component={WorkflowDetailPage}
+        />
+        <Route
+          exact
+          path="/app/requests/process/:processId"
+          component={ProcessDetailPage}
+        />
+        <Route exact path="/app/reports" component={ReportsPage} />
+        <Route exact path="/app/import-material" component={ImportMaterialPage} />
+        <Route exact path="/app/export-material" component={ExportMaterialPage} />
+        <Route exact path="/app/support" component={SupportPage} />
+        <Route exact path="/app">
+          <Redirect to="/app/dashboard" />
+        </Route>
+      </IonRouterOutlet>
 
-    <IonTabBar slot="bottom">
-      <IonTabButton tab="dashboard" href="/app/dashboard">
-        <IonIcon aria-hidden="true" icon={homeOutline} />
-        <IonLabel>Dashboard</IonLabel>
-      </IonTabButton>
-      <IonTabButton tab="applications" href="/app/applications">
-        <IonIcon aria-hidden="true" icon={appsOutline} />
-        <IonLabel>Ứng dụng</IonLabel>
-      </IonTabButton>
-      <IonTabButton tab="notifications" href="/app/notifications">
-        <IonIcon aria-hidden="true" icon={notificationsOutline} />
-        <IonLabel>Thông báo</IonLabel>
-      </IonTabButton>
-      <IonTabButton tab="profile" href="/app/profile">
-        <IonIcon aria-hidden="true" icon={personOutline} />
-        <IonLabel>Cá nhân</IonLabel>
-      </IonTabButton>
-    </IonTabBar>
-  </IonTabs>
-);
+      <IonTabBar slot="bottom">
+        <IonTabButton tab="dashboard" href="/app/dashboard">
+          <IonIcon aria-hidden="true" icon={homeOutline} />
+          <IonLabel>Dashboard</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="applications" href="/app/applications">
+          <IonIcon aria-hidden="true" icon={appsOutline} />
+          <IonLabel>Ứng dụng</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="notifications" href="/app/notifications">
+          <IonIcon aria-hidden="true" icon={notificationsOutline} />
+          <IonLabel>Thông báo</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="profile" href="/app/profile">
+          <IonIcon aria-hidden="true" icon={personOutline} />
+          <IonLabel>Cá nhân</IonLabel>
+        </IonTabButton>
+      </IonTabBar>
+    </IonTabs>
+  );
+};
 
 const App: React.FC = () => (
   <IonApp>

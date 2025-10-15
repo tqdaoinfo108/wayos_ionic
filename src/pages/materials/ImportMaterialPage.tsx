@@ -67,9 +67,9 @@ interface ImportFormState {
 }
 
 const inboundSlots: Array<{ key: ImageSlot; label: string }> = [
-  { key: 'ImageIn1', label: 'Material photo 1' },
-  { key: 'ImageIn2', label: 'Material photo 2' },
-  { key: 'ImageIn3', label: 'Material photo 3' },
+  { key: 'ImageIn1', label: 'Ảnh vật tư 1' },
+  { key: 'ImageIn2', label: 'Ảnh vật tư 2' },
+  { key: 'ImageIn3', label: 'Ảnh vật tư 3' },
 ];
 
 const initialImageState: ImageState = { previewUrl: null, publicPath: null, uploading: false };
@@ -219,7 +219,7 @@ const ImportMaterialPage: React.FC = () => {
         }
       } catch (error) {
         showToast(
-          error instanceof Error ? error.message : 'Unable to generate intake title automatically.',
+          error instanceof Error ? error.message : 'Không thể tạo tiêu đề phiếu tự động.',
         );
       } finally {
         setTitleLoading(false);
@@ -296,7 +296,7 @@ const ImportMaterialPage: React.FC = () => {
 
       await refreshTitle(true);
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Unable to load lookup data.');
+      showToast(error instanceof Error ? error.message : 'Không thể tải dữ liệu tra cứu.');
     } finally {
       setLookupsLoading(false);
     }
@@ -361,7 +361,7 @@ const ImportMaterialPage: React.FC = () => {
       try {
         const result = await uploadPublicFile(file, { subDirectory: 'TrackingBill' });
         if (!result?.publicPath) {
-          throw new Error('Upload succeeded but server did not return a path.');
+          throw new Error('Tải lên thành công nhưng máy chủ không trả về đường dẫn.');
         }
 
         setForm((prev) => ({
@@ -385,7 +385,7 @@ const ImportMaterialPage: React.FC = () => {
           };
         });
 
-        showToast('Photo uploaded successfully.', 'success');
+        showToast('Đã tải ảnh lên thành công.', 'success');
       } catch (error) {
         if (createdObjectUrl) {
           URL.revokeObjectURL(previewUrl);
@@ -405,7 +405,7 @@ const ImportMaterialPage: React.FC = () => {
           [slot]: null,
         }));
 
-        showToast(error instanceof Error ? error.message : 'Unable to upload photo.');
+        showToast(error instanceof Error ? error.message : 'Không thể tải ảnh lên.');
       }
     },
     [showToast],
@@ -450,26 +450,26 @@ const ImportMaterialPage: React.FC = () => {
     const errors: string[] = [];
 
     if (!form.ProjectID) {
-      errors.push('Select a project.');
+      errors.push('Vui lòng chọn dự án.');
     }
     if (!form.TypeTrackingBillID) {
-      errors.push('Select a material type.');
+      errors.push('Vui lòng chọn loại vật tư.');
     }
     if (!form.DeliveryVehicleID) {
-      errors.push('Select a delivery vehicle.');
+      errors.push('Vui lòng chọn phương tiện vận chuyển.');
     }
     if (!form.TitleBill) {
-      errors.push('Unable to generate ticket title. Please refresh and try again.');
+      errors.push('Không thể tạo tiêu đề phiếu. Vui lòng làm mới và thử lại.');
     }
     if (!form.Amount || form.Amount <= 0) {
-      errors.push('Quantity must be greater than zero.');
+      errors.push('Số lượng phải lớn hơn 0.');
     }
 
     const hasInboundImage = inboundSlots.some(
       (slot) => images[slot.key].publicPath && images[slot.key].publicPath !== '',
     );
     if (!hasInboundImage) {
-      errors.push('Attach at least one material photo.');
+      errors.push('Vui lòng chụp ít nhất một ảnh vật tư.');
     }
 
     return errors;
@@ -507,7 +507,7 @@ const ImportMaterialPage: React.FC = () => {
 
       const result = await createTrackingBill(payload);
       if (result) {
-        showToast('Saved intake ticket successfully.', 'success');
+        showToast('Đã lưu phiếu nhập thành công.', 'success');
         resetImages();
         setForm((prev) => ({
           ...prev,
@@ -520,10 +520,10 @@ const ImportMaterialPage: React.FC = () => {
         setIsFirstTitleFetch(true);
         await refreshTitle(true);
       } else {
-        showToast('Server returned an empty response.');
+        showToast('Máy chủ trả về phản hồi trống.');
       }
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Unable to save intake ticket.');
+      showToast(error instanceof Error ? error.message : 'Không thể lưu phiếu nhập.');
     } finally {
       setSubmitting(false);
     }
@@ -532,249 +532,491 @@ const ImportMaterialPage: React.FC = () => {
   const renderImageCard = (slot: ImageSlot, label: string) => {
     const state = images[slot];
     const hasUpload = state.publicPath && state.publicPath !== '';
+    const slotNumber = slot.replace('ImageIn', '');
 
     return (
-      <IonCard key={slot}>
-        <IonCardContent className="ion-text-center">
-          <IonText color="medium">
-            <h3>{label}</h3>
-          </IonText>
-          <div
-            style={{
-              width: '100%',
-              height: '180px',
-              marginTop: '12px',
-              borderRadius: '8px',
-              border: '1px dashed var(--ion-color-medium)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-              background: 'var(--ion-color-light)',
-            }}
-          >
-            {state.uploading ? (
-              <IonSpinner />
-            ) : state.previewUrl ? (
+      <div key={slot} style={{
+        background: '#ffffff',
+        borderRadius: '12px',
+        border: '1px solid #e2e8f0',
+        padding: '16px',
+        boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)'
+      }}>
+        <IonText>
+          <p style={{
+            margin: '0 0 12px',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#0f172a'
+          }}>
+            Ảnh {slotNumber}
+          </p>
+        </IonText>
+        
+        <div
+          style={{
+            width: '100%',
+            height: '200px',
+            borderRadius: '10px',
+            border: state.previewUrl ? 'none' : '2px dashed #cbd5e1',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            background: state.previewUrl ? '#000' : '#f8fafc',
+            position: 'relative',
+            marginBottom: '12px'
+          }}
+        >
+          {state.uploading ? (
+            <div style={{ textAlign: 'center' }}>
+              <IonSpinner color="primary" />
+              <p style={{ 
+                margin: '8px 0 0', 
+                fontSize: '13px', 
+                color: '#64748b' 
+              }}>
+                Đang tải lên...
+              </p>
+            </div>
+          ) : state.previewUrl ? (
+            <>
               <img
                 src={state.previewUrl ?? ''}
                 alt={label}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'contain' 
+                }}
               />
-            ) : hasUpload ? (
-              <IonText color="success">
-                <p>Upload completed</p>
-              </IonText>
-            ) : (
-              <IonText color="medium">
-                <p>No photo</p>
-              </IonText>
-            )}
-          </div>
-
-          <div
-            className="ion-margin-top"
-            style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}
-          >
-            <IonButton
-              color="primary"
-              disabled={state.uploading}
-              onClick={() =>
-                setCaptureConfig({
-                  slot,
-                  title: form.TitleBill || 'Material Intake',
-                })
-              }
-            >
-              <IonIcon icon={cameraOutline} slot="start" />
-              Capture Photo
-            </IonButton>
-            <IonButton
-              color="medium"
-              fill="outline"
-              disabled={state.uploading}
-              onClick={() => handleTriggerCapture(slot)}
-            >
-              Upload file
-            </IonButton>
-            {(hasUpload || state.previewUrl) && (
               <IonButton
-                color="medium"
-                fill="clear"
-                disabled={state.uploading}
+                fill="solid"
+                color="light"
+                size="small"
                 onClick={() => handleRemoveImage(slot)}
+                style={{
+                  position: 'absolute',
+                  top: '8px',
+                  right: '8px',
+                  '--border-radius': '8px',
+                  opacity: 0.95
+                }}
               >
-                <IonIcon icon={closeCircleOutline} slot="start" />
-                Remove
+                <IonIcon icon={closeCircleOutline} />
               </IonButton>
-            )}
-          </div>
+            </>
+          ) : hasUpload ? (
+            <div style={{ textAlign: 'center', color: '#10b981' }}>
+              <IonIcon 
+                icon={cameraOutline} 
+                style={{ fontSize: '32px', marginBottom: '8px' }} 
+              />
+              <p style={{ margin: 0, fontSize: '13px', fontWeight: '500' }}>
+                Đã tải lên
+              </p>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+              <IonIcon 
+                icon={cameraOutline} 
+                style={{ fontSize: '32px', marginBottom: '8px' }} 
+              />
+              <p style={{ margin: 0, fontSize: '13px' }}>
+                Chưa có ảnh
+              </p>
+            </div>
+          )}
+        </div>
 
-          <input
-            ref={inputRefs[slot]}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            hidden
-            onChange={(event) => void handleFileSelected(slot, event)}
-          />
-        </IonCardContent>
-      </IonCard>
+        <div style={{ 
+          display: 'flex', 
+          gap: '8px', 
+          flexDirection: 'column'
+        }}>
+          <IonButton
+            expand="block"
+            color="primary"
+            size="default"
+            disabled={state.uploading}
+            onClick={() =>
+              setCaptureConfig({
+                slot,
+                title: form.TitleBill || 'Nhập vật tư',
+              })
+            }
+            style={{
+              '--border-radius': '10px',
+              height: '44px',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+          >
+            <IonIcon icon={cameraOutline} slot="start" />
+            Chụp ảnh
+          </IonButton>
+          <IonButton
+            expand="block"
+            fill="outline"
+            color="medium"
+            size="default"
+            disabled={state.uploading}
+            onClick={() => handleTriggerCapture(slot)}
+            style={{
+              '--border-radius': '10px',
+              height: '44px',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+          >
+            Chọn từ thiết bị
+          </IonButton>
+        </div>
+
+        <input
+          ref={inputRefs[slot]}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          onChange={(event) => void handleFileSelected(slot, event)}
+        />
+      </div>
     );
   };
 
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar color="light">
+        <IonToolbar color="primary">
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/reports" />
+            <IonBackButton defaultHref="/app/applications" />
           </IonButtons>
-          <IonTitle>Material Intake</IonTitle>
+          <IonTitle>Nhập vật tư</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => void refreshTitle(true)} disabled={titleLoading}>
-              <IonIcon icon={refreshOutline} slot="start" />
-              Refresh title
+              <IonIcon icon={refreshOutline} />
             </IonButton>
           </IonButtons>
         </IonToolbar>
         {(lookupsLoading || titleLoading || submitting) && <IonProgressBar type="indeterminate" />}
       </IonHeader>
 
-      <IonContent fullscreen className="ion-padding">
+      <IonContent fullscreen style={{ '--background': '#f8fafc' }}>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Material Intake</IonTitle>
+            <IonTitle size="large">Nhập vật tư</IonTitle>
           </IonToolbar>
         </IonHeader>
 
-        <IonCard>
-          <IonCardContent>
-            <IonText color="medium">
-              <h3>Ticket information</h3>
+        <div className="ion-padding" style={{ paddingBottom: '100px', maxWidth: '1200px', margin: '0 auto' }}>
+          {/* Header Section */}
+          <div style={{
+            background: 'linear-gradient(135deg, #e8f1ff 0%, #f8fbff 100%)',
+            borderRadius: '16px',
+            padding: '24px 20px',
+            marginBottom: '20px',
+            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)'
+          }}>
+            <IonText>
+              <h1 style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                margin: '0 0 8px',
+                color: '#0f172a'
+              }}>
+                Tạo phiếu nhập vật tư
+              </h1>
+              <p style={{
+                margin: '0',
+                color: '#475569',
+                fontSize: '14px',
+                lineHeight: '1.5'
+              }}>
+                Điền thông tin và chụp ảnh vật tư để tạo phiếu nhập kho
+              </p>
             </IonText>
+          </div>
 
-            <IonItem className="ion-margin-top">
-              <IonLabel position="stacked">Project *</IonLabel>
-              <IonSelect
-                interface="popover"
-                placeholder="Select project"
-                value={form.ProjectID ?? ''}
-                onIonChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    ProjectID: toOptionalNumber(event.detail.value),
-                  }))
-                }
-              >
-                <IonSelectOption value="">Not selected</IonSelectOption>
-                {projectOptions.map((option) => (
-                  <IonSelectOption key={`project-${option.value}`} value={option.value}>
-                    {option.label}
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-            </IonItem>
+          {/* Form Card */}
+          <IonCard style={{
+            margin: '0 0 16px',
+            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
+            borderRadius: '16px',
+            border: '1px solid #e2e8f0'
+          }}>
+            <IonCardContent style={{ padding: '24px' }}>
+              <IonText>
+                <h2 style={{
+                  fontSize: '17px',
+                  fontWeight: '600',
+                  margin: '0 0 20px',
+                  color: '#0f172a',
+                  letterSpacing: '-0.01em'
+                }}>
+                  Thông tin phiếu
+                </h2>
+              </IonText>
 
-            <IonItem className="ion-margin-top">
-              <IonLabel position="stacked">Material type *</IonLabel>
-              <IonSelect
-                interface="popover"
-                placeholder="Select material type"
-                value={form.TypeTrackingBillID ?? ''}
-                onIonChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    TypeTrackingBillID: toOptionalNumber(event.detail.value),
-                  }))
-                }
-              >
-                <IonSelectOption value="">Not selected</IonSelectOption>
-                {trackingTypeOptions.map((option) => (
-                  <IonSelectOption key={`type-${option.value}`} value={option.value}>
-                    {option.label}
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-            </IonItem>
+              <IonItem lines="none" style={{ 
+                '--background': '#f8fafc',
+                '--padding-start': '16px',
+                '--inner-padding-end': '16px',
+                borderRadius: '12px',
+                marginBottom: '16px'
+              }}>
+                <IonLabel position="stacked" style={{ 
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#0f172a'
+                }}>
+                  Dự án <span style={{ color: '#dc2626' }}>*</span>
+                </IonLabel>
+                <IonSelect
+                  interface="popover"
+                  placeholder="Chọn dự án"
+                  value={form.ProjectID ?? ''}
+                  onIonChange={(event) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      ProjectID: toOptionalNumber(event.detail.value),
+                    }))
+                  }
+                  style={{ 
+                    '--padding-start': '0',
+                    '--padding-end': '0',
+                    fontWeight: '500',
+                    color: '#0f172a'
+                  }}
+                >
+                  <IonSelectOption value="">Chưa chọn</IonSelectOption>
+                  {projectOptions.map((option) => (
+                    <IonSelectOption key={`project-${option.value}`} value={option.value}>
+                      {option.label}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
 
-            <IonItem className="ion-margin-top">
-              <IonLabel position="stacked">Delivery vehicle *</IonLabel>
-              <IonSelect
-                interface="popover"
-                placeholder="Select delivery vehicle"
-                value={form.DeliveryVehicleID ?? ''}
-                onIonChange={(event) => handleDeliverySelect(event.detail.value)}
-              >
-                <IonSelectOption value="">Not selected</IonSelectOption>
-                {deliveryVehicleOptions.map((option) => (
-                  <IonSelectOption key={`vehicle-${option.value}`} value={option.value}>
-                    {option.label}
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-            </IonItem>
+              <IonItem lines="none" style={{ 
+                '--background': '#f8fafc',
+                '--padding-start': '16px',
+                '--inner-padding-end': '16px',
+                borderRadius: '12px',
+                marginBottom: '16px'
+              }}>
+                <IonLabel position="stacked" style={{ 
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#0f172a'
+                }}>
+                  Loại vật tư <span style={{ color: '#dc2626' }}>*</span>
+                </IonLabel>
+                <IonSelect
+                  interface="popover"
+                  placeholder="Chọn loại vật tư"
+                  value={form.TypeTrackingBillID ?? ''}
+                  onIonChange={(event) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      TypeTrackingBillID: toOptionalNumber(event.detail.value),
+                    }))
+                  }
+                  style={{ 
+                    '--padding-start': '0',
+                    '--padding-end': '0',
+                    fontWeight: '500',
+                    color: '#0f172a'
+                  }}
+                >
+                  <IonSelectOption value="">Chưa chọn</IonSelectOption>
+                  {trackingTypeOptions.map((option) => (
+                    <IonSelectOption key={`type-${option.value}`} value={option.value}>
+                      {option.label}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
 
-            <IonItem className="ion-margin-top" lines="none">
-              <IonLabel position="stacked">Ticket title</IonLabel>
-              <IonText color="dark">
-                <p className="ion-padding-start ion-padding-end ion-no-margin">
-                  {titleLoading ? 'Generating title...' : form.TitleBill || 'Not available'}
+              <IonItem lines="none" style={{ 
+                '--background': '#f8fafc',
+                '--padding-start': '16px',
+                '--inner-padding-end': '16px',
+                borderRadius: '12px',
+                marginBottom: '16px'
+              }}>
+                <IonLabel position="stacked" style={{ 
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#0f172a'
+                }}>
+                  Phương tiện vận chuyển <span style={{ color: '#dc2626' }}>*</span>
+                </IonLabel>
+                <IonSelect
+                  interface="popover"
+                  placeholder="Chọn phương tiện"
+                  value={form.DeliveryVehicleID ?? ''}
+                  onIonChange={(event) => handleDeliverySelect(event.detail.value)}
+                  style={{ 
+                    '--padding-start': '0',
+                    '--padding-end': '0',
+                    fontWeight: '500',
+                    color: '#0f172a'
+                  }}
+                >
+                  <IonSelectOption value="">Chưa chọn</IonSelectOption>
+                  {deliveryVehicleOptions.map((option) => (
+                    <IonSelectOption key={`vehicle-${option.value}`} value={option.value}>
+                      {option.label}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
+
+              <div style={{
+                background: '#e0f2fe',
+                border: '1px solid #bae6fd',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '16px'
+              }}>
+                <IonText>
+                  <p style={{
+                    margin: '0 0 4px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: '#0369a1',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    Tiêu đề phiếu
+                  </p>
+                  <p style={{
+                    margin: 0,
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    color: '#0c4a6e',
+                    lineHeight: '1.5'
+                  }}>
+                    {titleLoading ? 'Đang tạo tiêu đề...' : form.TitleBill || 'Chưa có tiêu đề'}
+                  </p>
+                </IonText>
+              </div>
+
+              <IonItem lines="none" style={{ 
+                '--background': '#f8fafc',
+                '--padding-start': '16px',
+                '--inner-padding-end': '16px',
+                borderRadius: '12px'
+              }}>
+                <IonLabel position="stacked" style={{ 
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#0f172a'
+                }}>
+                  Số lượng <span style={{ color: '#dc2626' }}>*</span>
+                </IonLabel>
+                <IonInput
+                  type="number"
+                  inputmode="decimal"
+                  value={amountText}
+                  placeholder="0"
+                  onIonChange={(event) => handleAmountChange(event.detail.value)}
+                  style={{ 
+                    '--padding-start': '0',
+                    '--padding-end': '0',
+                    fontWeight: '500',
+                    color: '#0f172a',
+                    fontSize: '15px'
+                  }}
+                />
+              </IonItem>
+            </IonCardContent>
+          </IonCard>
+
+          {/* Photos Card */}
+          <IonCard style={{
+            margin: '0',
+            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
+            borderRadius: '16px',
+            border: '1px solid #e2e8f0'
+          }}>
+            <IonCardContent style={{ padding: '24px' }}>
+              <IonText>
+                <h2 style={{
+                  fontSize: '17px',
+                  fontWeight: '600',
+                  margin: '0 0 4px',
+                  color: '#0f172a',
+                  letterSpacing: '-0.01em'
+                }}>
+                  Hình ảnh vật tư
+                </h2>
+                <p style={{
+                  margin: '0 0 20px',
+                  fontSize: '13px',
+                  color: '#64748b'
+                }}>
+                  Tối thiểu 1 ảnh, tối đa 3 ảnh
                 </p>
               </IonText>
-            </IonItem>
-
-            <IonItem className="ion-margin-top">
-              <IonLabel position="stacked">Quantity *</IonLabel>
-              <IonInput
-                type="number"
-                inputmode="decimal"
-                value={amountText}
-                placeholder="0"
-                onIonChange={(event) => handleAmountChange(event.detail.value)}
-              />
-            </IonItem>
-          </IonCardContent>
-        </IonCard>
-
-        <IonCard>
-          <IonCardContent>
-            <IonText color="medium">
-              <h3>Material photos (up to 3)</h3>
-              <p className="ion-no-margin">At least one photo is required.</p>
-            </IonText>
-            <IonGrid className="ion-margin-top">
-              <IonRow>
-                {inboundSlots.map(({ key, label }) => (
-                  <IonCol size="12" sizeMd="6" key={key}>
-                    {renderImageCard(key, label)}
-                  </IonCol>
-                ))}
-              </IonRow>
-            </IonGrid>
-          </IonCardContent>
-        </IonCard>
+              <IonGrid style={{ padding: 0 }}>
+                <IonRow>
+                  {inboundSlots.map(({ key, label }) => (
+                    <IonCol size="12" sizeMd="6" sizeLg="4" key={key} style={{ padding: '0 8px 16px' }}>
+                      {renderImageCard(key, label)}
+                    </IonCol>
+                  ))}
+                </IonRow>
+              </IonGrid>
+            </IonCardContent>
+          </IonCard>
+        </div>
       </IonContent>
 
-      <IonFooter>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonButton fill="outline" color="medium" routerLink="/app/reports">
-              Back
+      <IonFooter style={{
+        boxShadow: '0 -4px 12px rgba(15, 23, 42, 0.06)',
+        borderTop: '1px solid #e2e8f0'
+      }}>
+        <IonToolbar style={{ '--background': '#ffffff', padding: '8px 16px' }}>
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            justifyContent: 'flex-end',
+            maxWidth: '1200px',
+            margin: '0 auto'
+          }}>
+            <IonButton 
+              fill="clear" 
+              color="medium" 
+              routerLink="/app/applications"
+              style={{ '--border-radius': '12px' }}
+            >
+              Hủy
             </IonButton>
-          </IonButtons>
-          <IonButtons slot="end">
-            <IonButton color="primary" disabled={submitting} onClick={() => void handleSubmit()}>
+            <IonButton 
+              color="primary" 
+              disabled={submitting} 
+              onClick={() => void handleSubmit()}
+              style={{
+                '--border-radius': '12px',
+                fontWeight: '600'
+              }}
+            >
               {submitting ? <IonSpinner slot="start" /> : <IonIcon icon={saveOutline} slot="start" />}
-              Save ticket
+              Lưu phiếu
             </IonButton>
-          </IonButtons>
+          </div>
         </IonToolbar>
       </IonFooter>
 
       <PhotoCaptureModal
         isOpen={captureConfig !== null}
-        title={captureConfig?.title ?? form.TitleBill ?? 'Material Intake'}
+        title={captureConfig?.title ?? form.TitleBill ?? 'Nhập vật tư'}
         onCancel={() => setCaptureConfig(null)}
         onComplete={async (file: File, previewDataUrl: string) => {
           const slot = captureConfig?.slot;
