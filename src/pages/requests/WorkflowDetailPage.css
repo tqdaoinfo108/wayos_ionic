@@ -1,0 +1,71 @@
+.workflow-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.workflow-step {
+  display: flex;
+  align-items: flex-start;
+}
+
+.workflow-step__indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 12px;
+}
+
+.workflow-step__dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.workflow-step__connector {
+  flex: 1;
+  width: 4px;
+  margin-top: 6px;
+  margin-bottom: -6px;
+}
+
+.workflow-step__content {
+  flex: 1;
+}
+
+.workflow-step__title {
+  font-weight: 600;
+  margin: 0;
+}
+
+.workflow-step__name {
+  margin: 4px 0;
+  font-weight: 500;
+}
+
+.workflow-field-details {
+  overflow-x: auto;
+}
+
+.workflow-field-details table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.workflow-field-details table,
+.workflow-field-details th,
+.workflow-field-details td {
+  border: 1px solid var(--ion-color-step-200, #ccc);
+}
+
+.workflow-field-details th,
+.workflow-field-details td {
+  padding: 8px;
+}
+
