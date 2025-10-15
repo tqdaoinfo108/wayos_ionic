@@ -52,10 +52,10 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import { getBasePath, withBasePath } from './utils/basePath';
 
-const baseFromEnv = import.meta.env.BASE_URL.replace(/\/$/, '');
-const routerBasename = baseFromEnv.length > 0 ? baseFromEnv : undefined;
-const buildHref = (path: string) => `${routerBasename ?? ''}${path}`;
+const basePath = getBasePath();
+const routerBasename = basePath.length > 0 ? basePath : undefined;
 
 setupIonicReact();
 
