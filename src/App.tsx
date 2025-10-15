@@ -53,6 +53,9 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 
+const baseFromEnv = import.meta.env.BASE_URL.replace(/\/$/, '');
+const routerBasename = baseFromEnv.length > 0 ? baseFromEnv : undefined;
+
 setupIonicReact();
 
 const Tabs: React.FC = () => (
@@ -83,19 +86,19 @@ const Tabs: React.FC = () => (
     </IonRouterOutlet>
 
     <IonTabBar slot="bottom">
-      <IonTabButton tab="dashboard" href="/app/dashboard">
+      <IonTabButton tab="dashboard" routerLink="/app/dashboard">
         <IonIcon aria-hidden="true" icon={homeOutline} />
         <IonLabel>Dashboard</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="applications" href="/app/applications">
+      <IonTabButton tab="applications" routerLink="/app/applications">
         <IonIcon aria-hidden="true" icon={appsOutline} />
         <IonLabel>Ứng dụng</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="notifications" href="/app/notifications">
+      <IonTabButton tab="notifications" routerLink="/app/notifications">
         <IonIcon aria-hidden="true" icon={notificationsOutline} />
         <IonLabel>Thông báo</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="profile" href="/app/profile">
+      <IonTabButton tab="profile" routerLink="/app/profile">
         <IonIcon aria-hidden="true" icon={personOutline} />
         <IonLabel>Cá nhân</IonLabel>
       </IonTabButton>
@@ -106,7 +109,7 @@ const Tabs: React.FC = () => (
 const App: React.FC = () => (
   <IonApp>
     <AuthProvider>
-      <IonReactRouter>
+      <IonReactRouter basename={routerBasename}>
         <IonRouterOutlet>
           <Route exact path="/login" component={LoginPage} />
           <ProtectedRoute path="/app" component={Tabs} />
@@ -120,4 +123,3 @@ const App: React.FC = () => (
 );
 
 export default App;
-
