@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { CSSProperties } from 'react';
 import {
   IonAlert,
   IonCard,
@@ -13,7 +14,6 @@ import {
   IonList,
   IonPage,
   IonRow,
-  IonText,
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
@@ -21,18 +21,19 @@ import {
   appsOutline,
   callOutline,
   documentTextOutline,
-  exitOutline,
   helpCircleOutline,
   logOutOutline,
   swapHorizontalOutline,
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import './ApplicationsPage.css';
 
 interface QuickAction {
   title: string;
   subtitle: string;
-  color: string;
+  accentColor: string;
+  accentSurface: string;
   path: string;
   icon: string;
 }
@@ -40,29 +41,33 @@ interface QuickAction {
 const quickActions: QuickAction[] = [
   {
     title: 'Quy trình',
-    subtitle: 'Theo dõi và xử lý yêu cầu',
-    color: 'warning',
+    subtitle: 'Theo dõi và xử lý yêu cầu nhanh chóng',
+    accentColor: '#2563eb',
+    accentSurface: 'rgba(37, 99, 235, 0.14)',
     path: '/app/requests',
     icon: documentTextOutline,
   },
   {
     title: 'Báo cáo',
-    subtitle: 'Xem thống kê vật tư',
-    color: 'tertiary',
+    subtitle: 'Theo dõi chỉ số hoạt động trực quan',
+    accentColor: '#0ea5e9',
+    accentSurface: 'rgba(14, 165, 233, 0.16)',
     path: '/app/reports',
     icon: appsOutline,
   },
   {
     title: 'Nhập vật tư',
-    subtitle: 'Ghi nhận phiếu nhập kho',
-    color: 'success',
+    subtitle: 'Tạo và quản lý phiếu nhập kho',
+    accentColor: '#10b981',
+    accentSurface: 'rgba(16, 185, 129, 0.16)',
     path: '/app/import-material',
     icon: swapHorizontalOutline,
   },
   {
     title: 'Xuất vật tư',
-    subtitle: 'Tạo phiếu xuất kho',
-    color: 'danger',
+    subtitle: 'Tự động hóa quy trình giao hàng',
+    accentColor: '#f97316',
+    accentSurface: 'rgba(249, 115, 22, 0.16)',
     path: '/app/export-material',
     icon: swapHorizontalOutline,
   },
@@ -80,32 +85,46 @@ const ApplicationsPage: React.FC = () => {
           <IonTitle>Ứng dụng</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className="ion-padding">
+      <IonContent fullscreen className="applications-page ion-padding">
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Ứng dụng</IonTitle>
           </IonToolbar>
         </IonHeader>
 
-        <section>
-          <IonText color="dark">
+        <div className="page-hero">
+          <div>
+            <h1>Ứng dụng WayOS</h1>
+            <p>Lựa chọn tác vụ để bắt đầu làm việc hiệu quả và đồng nhất.</p>
+          </div>
+        </div>
+
+        <section className="section">
+          <div className="section-header">
             <h2>Chức năng chính</h2>
-          </IonText>
-          <IonGrid>
+            <p>Truy cập nhanh các quy trình quản lý thường dùng.</p>
+          </div>
+          <IonGrid className="quick-actions-grid">
             <IonRow>
               {quickActions.map((action) => (
-                <IonCol size="12" sizeMd="6" key={action.title}>
+                <IonCol size="12" sizeMd="6" sizeLg="3" key={action.title}>
                   <IonCard
                     button
-                    color={action.color}
+                    className="quick-action-card"
+                    style={
+                      {
+                        '--accent-color': action.accentColor,
+                        '--accent-surface': action.accentSurface,
+                      } as CSSProperties
+                    }
                     onClick={() => history.push(action.path)}
                   >
                     <IonCardContent>
-                      <IonIcon icon={action.icon} size="large" />
-                      <IonText color="light">
-                        <h3 className="ion-margin-top ion-no-margin">{action.title}</h3>
-                        <p>{action.subtitle}</p>
-                      </IonText>
+                      <div className="icon-wrapper">
+                        <IonIcon icon={action.icon} />
+                      </div>
+                      <h3>{action.title}</h3>
+                      <p>{action.subtitle}</p>
                     </IonCardContent>
                   </IonCard>
                 </IonCol>
@@ -114,16 +133,17 @@ const ApplicationsPage: React.FC = () => {
           </IonGrid>
         </section>
 
-        <section className="ion-margin-top">
-          <IonText color="dark">
-            <h2>Tiện ích</h2>
-          </IonText>
-          <IonList inset>
+        <section className="section">
+          <div className="section-header">
+            <h2>Tiện ích hỗ trợ</h2>
+            <p>Tìm kiếm tài liệu và thông tin liên hệ cần thiết.</p>
+          </div>
+          <IonList inset className="support-list">
             <IonItem button detail onClick={() => history.push('/app/support')}>
               <IonIcon icon={helpCircleOutline} slot="start" />
               <IonLabel>
-                <h3>Hỗ trợ</h3>
-                <p>Hướng dẫn sử dụng</p>
+                <h3>Hướng dẫn sử dụng</h3>
+                <p>Bộ tài liệu và video thông tin</p>
               </IonLabel>
             </IonItem>
             <IonItem button detail onClick={() => history.push('/app/support')}>
@@ -136,14 +156,14 @@ const ApplicationsPage: React.FC = () => {
           </IonList>
         </section>
 
-        <section className="ion-margin-top">
-          <IonCard color="light" button onClick={() => setConfirmLogout(true)}>
+        <section className="section">
+          <IonCard button className="logout-card" onClick={() => setConfirmLogout(true)}>
             <IonCardContent className="ion-text-center">
-              <IonIcon icon={logOutOutline} size="large" color="danger" />
-              <IonText color="danger">
-                <h3 className="ion-margin-top ion-no-margin">Đăng xuất</h3>
-                <p>Thoát khỏi ứng dụng</p>
-              </IonText>
+              <div className="logout-icon">
+                <IonIcon icon={logOutOutline} />
+              </div>
+              <h3>Đăng xuất</h3>
+              <p>Thoát khỏi ứng dụng WayOS</p>
             </IonCardContent>
           </IonCard>
         </section>
@@ -176,4 +196,3 @@ const ApplicationsPage: React.FC = () => {
 };
 
 export default ApplicationsPage;
-

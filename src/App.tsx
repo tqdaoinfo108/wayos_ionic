@@ -47,15 +47,13 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
-/* Ionic Dark Mode */
-import '@ionic/react/css/palettes/dark.system.css';
-
 /* Theme variables */
 import './theme/variables.css';
 import { getBasePath, withBasePath } from './utils/basePath';
 
 const basePath = getBasePath();
 const routerBasename = basePath.length > 0 ? basePath : undefined;
+const buildHref = (path: string): string => withBasePath(path);
 
 setupIonicReact();
 
@@ -93,15 +91,15 @@ const Tabs: React.FC = () => (
       </IonTabButton>
       <IonTabButton tab="applications" href={buildHref('/app/applications')}>
         <IonIcon aria-hidden="true" icon={appsOutline} />
-        <IonLabel>Ung dung</IonLabel>
+        <IonLabel>Ứng dụng</IonLabel>
       </IonTabButton>
       <IonTabButton tab="notifications" href={buildHref('/app/notifications')}>
         <IonIcon aria-hidden="true" icon={notificationsOutline} />
-        <IonLabel>Thong bao</IonLabel>
+        <IonLabel>Thông báo</IonLabel>
       </IonTabButton>
       <IonTabButton tab="profile" href={buildHref('/app/profile')}>
         <IonIcon aria-hidden="true" icon={personOutline} />
-        <IonLabel>Ca nhan</IonLabel>
+        <IonLabel>Cá nhân</IonLabel>
       </IonTabButton>
     </IonTabBar>
   </IonTabs>
