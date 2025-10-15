@@ -13,7 +13,6 @@ export interface RequestOptions {
 }
 
 const isBrowser = typeof window !== 'undefined';
-
 const API_BASE_URL = isBrowser
   ? 'https://quocdung.sitienbmt.workers.dev/?url=http://freeofficeapi.gvbsoft.vn/api'
   : 'http://freeofficeapi.gvbsoft.vn/api';
