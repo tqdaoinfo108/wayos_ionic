@@ -2,12 +2,14 @@
 
 import legacy from '@vitejs/plugin-legacy'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
+
+const BASE_PATH = '/wayos_ionic2/'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/wayos_ionic/',  
+  base: BASE_PATH,
   plugins: [
     react(),
     legacy(),
@@ -21,8 +23,8 @@ export default defineConfig({
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        scope: BASE_PATH,
+        start_url: BASE_PATH,
         icons: [
           {
             src: 'icons/icon-192x192.png',
