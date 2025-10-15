@@ -85,19 +85,19 @@ const Tabs: React.FC = () => (
     </IonRouterOutlet>
 
     <IonTabBar slot="bottom">
-      <IonTabButton tab="dashboard" href={buildHref('/app/dashboard')}>
+      <IonTabButton tab="dashboard" href="/app/dashboard">
         <IonIcon aria-hidden="true" icon={homeOutline} />
         <IonLabel>Dashboard</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="applications" href={buildHref('/app/applications')}>
+      <IonTabButton tab="applications" href="/app/applications">
         <IonIcon aria-hidden="true" icon={appsOutline} />
         <IonLabel>Ứng dụng</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="notifications" href={buildHref('/app/notifications')}>
+      <IonTabButton tab="notifications" href="/app/notifications">
         <IonIcon aria-hidden="true" icon={notificationsOutline} />
         <IonLabel>Thông báo</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="profile" href={buildHref('/app/profile')}>
+      <IonTabButton tab="profile" href="/app/profile">
         <IonIcon aria-hidden="true" icon={personOutline} />
         <IonLabel>Cá nhân</IonLabel>
       </IonTabButton>
