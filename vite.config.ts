@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-const BASE_PATH = '/wayos_ionic2/'
+const BASE_PATH = '/wayos_ionic/'
 
 // https://vitejs.dev/config/
 export default defineConfig({
