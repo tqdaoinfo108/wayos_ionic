@@ -135,12 +135,67 @@ const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
         audio: false,
       };
 
+      console.log('Requesting camera access...', constraints);
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('Camera stream obtained:', stream.getVideoTracks()[0].getSettings());
       streamRef.current = stream;
 
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        const video = videoRef.current;
+        
+        // CRITICAL: Set srcObject and force load
+        video.srcObject = stream;
+        video.load(); // Force load the stream
+        
+        console.log('Video element srcObject set and load() called');
+        
+        // Wait for video to be ready
+        await new Promise<void>((resolve) => {
+          const timeoutId = setTimeout(() => {
+            console.warn('Video metadata timeout');
+            resolve();
+          }, 8000);
+          
+          const onMetadata = () => {
+            clearTimeout(timeoutId);
+            console.log('✅ Video metadata loaded', {
+              videoWidth: video.videoWidth,
+              videoHeight: video.videoHeight,
+              readyState: video.readyState,
+            });
+            resolve();
+          };
+          
+          if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+            console.log('✅ Video already has metadata');
+            onMetadata();
+          } else {
+            video.addEventListener('loadedmetadata', onMetadata, { once: true });
+          }
+        });
+        
+        // Force play
+        try {
+          video.muted = true; // Ensure muted for autoplay
+          await video.play();
+          console.log('✅ Video playing', {
+            paused: video.paused,
+            videoWidth: video.videoWidth,
+            videoHeight: video.videoHeight,
+            readyState: video.readyState
+          });
+        } catch (playError) {
+          console.error('❌ Video play error:', playError);
+          // Try one more time after a delay
+          setTimeout(async () => {
+            try {
+              await video.play();
+              console.log('✅ Video playing on retry');
+            } catch (e) {
+              console.error('❌ Video play retry failed:', e);
+            }
+          }, 500);
+        }
       }
 
       setStreamState('ready');
@@ -149,7 +204,7 @@ const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
       setStreamError(
         error instanceof Error
           ? error.message
-          : 'Unable to access the camera. Check permissions and device compatibility.',
+          : 'Không thể truy cập camera. Kiểm tra quyền và khả năng tương thích thiết bị.',
       );
       setStreamState('error');
     }
@@ -427,7 +482,31 @@ const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
                 )}
 
                 {showVideoPreview && (
-                  <video ref={videoRef} playsInline muted autoPlay className="photo-capture-video" />
+                  <>
+                    <video 
+                      ref={videoRef} 
+                      playsInline 
+                      muted 
+                      autoPlay 
+                      className="photo-capture-video"
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      top: '10px',
+                      left: '10px',
+                      background: 'rgba(255,0,0,0.7)',
+                      color: 'white',
+                      padding: '8px',
+                      fontSize: '12px',
+                      zIndex: 999,
+                      borderRadius: '4px'
+                    }}>
+                      Video Element Active
+                      <br/>Stream: {streamState}
+                      <br/>Size: {videoRef.current?.videoWidth || 0}x{videoRef.current?.videoHeight || 0}
+                      <br/>Ready: {videoRef.current?.readyState || 0}
+                    </div>
+                  </>
                 )}
 
                 {capturedDataUrl && (
@@ -505,46 +584,79 @@ const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
         {`
           .photo-capture-modal {
             --background: #000;
+            --height: 100%;
+            --width: 100%;
+          }
+          .photo-capture-modal ion-backdrop {
+            opacity: 1 !important;
           }
           .photo-capture-content {
             --background: #000;
+            --padding-top: 0;
+            --padding-bottom: 0;
+            --padding-start: 0;
+            --padding-end: 0;
           }
           .photo-capture-wrapper {
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 16px;
+            width: 100%;
+            padding: 0;
             box-sizing: border-box;
+            background: #000;
           }
           .photo-capture-preview {
             flex: 1;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #111;
-            border-radius: 16px;
+            display: block;
+            background: #000;
             overflow: hidden;
+            width: 100%;
+            height: 100%;
           }
-          .photo-capture-video,
+          .photo-capture-video {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+            background: #000 !important;
+            z-index: 1 !important;
+          }
           .photo-capture-image {
-            max-width: 100%;
-            max-height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
+            display: block;
+            z-index: 2;
           }
           .photo-capture-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
             color: #fff;
+            z-index: 10;
           }
           .photo-capture-footer {
-            margin-top: 16px;
+            position: relative;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
             color: #f1f1f1;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
           }
           .photo-metadata {
             font-size: 14px;
@@ -603,9 +715,6 @@ const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
             padding: 24px;
           }
           @media (max-width: 768px) {
-            .photo-capture-wrapper {
-              padding: 12px;
-            }
             .photo-capture-actions-row {
               flex-direction: column;
               width: 100%;

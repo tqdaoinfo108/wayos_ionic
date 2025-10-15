@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   ChangeEvent,
   MutableRefObject,
   useCallback,
@@ -31,9 +31,16 @@ import {
   IonText,
   IonTitle,
   IonToolbar,
+  isPlatform,
   useIonToast,
 } from '@ionic/react';
-import { cameraOutline, closeCircleOutline, refreshOutline, saveOutline } from 'ionicons/icons';
+import {
+  cameraOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
+  refreshOutline,
+  saveOutline,
+} from 'ionicons/icons';
 import {
   LookupItem,
   createTrackingBill,
@@ -46,6 +53,7 @@ import {
 import { getProjects, ProjectItem } from '../../services/projectService';
 import { mapLookupOptions, toOptionalNumber } from '../../utils/lookup';
 import PhotoCaptureModal from '../../components/PhotoCaptureModal';
+import './ImportMaterialPage.css';
 
 type ImageSlot = 'ImageIn1' | 'ImageIn2' | 'ImageIn3';
 
@@ -67,9 +75,9 @@ interface ImportFormState {
 }
 
 const inboundSlots: Array<{ key: ImageSlot; label: string }> = [
-  { key: 'ImageIn1', label: 'Ảnh vật tư 1' },
-  { key: 'ImageIn2', label: 'Ảnh vật tư 2' },
-  { key: 'ImageIn3', label: 'Ảnh vật tư 3' },
+  { key: 'ImageIn1', label: 'áº¢nh váº­t tÆ° 1' },
+  { key: 'ImageIn2', label: 'áº¢nh váº­t tÆ° 2' },
+  { key: 'ImageIn3', label: 'áº¢nh váº­t tÆ° 3' },
 ];
 
 const initialImageState: ImageState = { previewUrl: null, publicPath: null, uploading: false };
@@ -111,6 +119,47 @@ const ImportMaterialPage: React.FC = () => {
   };
 
   const [captureConfig, setCaptureConfig] = useState<{ slot: ImageSlot; title: string } | null>(null);
+
+  const isNativeMobile = isPlatform('android') || isPlatform('ios');
+  const [isCompactViewport, setIsCompactViewport] = useState<boolean>(() => {
+    if (typeof window === 'undefined') {
+      return isNativeMobile;
+    }
+    return window.matchMedia('(max-width: 767px)').matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const handleMediaChange = (event: MediaQueryListEvent) => {
+      setIsCompactViewport(event.matches);
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleMediaChange);
+    } else {
+      mediaQuery.addListener(handleMediaChange);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleMediaChange);
+      } else {
+        mediaQuery.removeListener(handleMediaChange);
+      }
+    };
+  }, [setIsCompactViewport]);
+
+  const selectInterface = isNativeMobile || isCompactViewport ? 'action-sheet' : 'popover';
+  const selectInterfaceOptions = useMemo(
+    () => ({
+      cssClass: 'import-select-interface',
+    }),
+    [],
+  );
 
   const extractTitleValue = useCallback((value: unknown): string => {
     if (!value) return '';
@@ -219,7 +268,7 @@ const ImportMaterialPage: React.FC = () => {
         }
       } catch (error) {
         showToast(
-          error instanceof Error ? error.message : 'Không thể tạo tiêu đề phiếu tự động.',
+          error instanceof Error ? error.message : 'KhÃ´ng thá»ƒ táº¡o tiÃªu Ä‘á» phiáº¿u tá»± Ä‘á»™ng.',
         );
       } finally {
         setTitleLoading(false);
@@ -296,7 +345,7 @@ const ImportMaterialPage: React.FC = () => {
 
       await refreshTitle(true);
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Không thể tải dữ liệu tra cứu.');
+      showToast(error instanceof Error ? error.message : 'KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u tra cá»©u.');
     } finally {
       setLookupsLoading(false);
     }
@@ -361,7 +410,7 @@ const ImportMaterialPage: React.FC = () => {
       try {
         const result = await uploadPublicFile(file, { subDirectory: 'TrackingBill' });
         if (!result?.publicPath) {
-          throw new Error('Tải lên thành công nhưng máy chủ không trả về đường dẫn.');
+          throw new Error('Táº£i lÃªn thÃ nh cÃ´ng nhÆ°ng mÃ¡y chá»§ khÃ´ng tráº£ vá» Ä‘Æ°á»ng dáº«n.');
         }
 
         setForm((prev) => ({
@@ -385,7 +434,7 @@ const ImportMaterialPage: React.FC = () => {
           };
         });
 
-        showToast('Đã tải ảnh lên thành công.', 'success');
+        showToast('ÄÃ£ táº£i áº£nh lÃªn thÃ nh cÃ´ng.', 'success');
       } catch (error) {
         if (createdObjectUrl) {
           URL.revokeObjectURL(previewUrl);
@@ -405,7 +454,7 @@ const ImportMaterialPage: React.FC = () => {
           [slot]: null,
         }));
 
-        showToast(error instanceof Error ? error.message : 'Không thể tải ảnh lên.');
+        showToast(error instanceof Error ? error.message : 'KhÃ´ng thá»ƒ táº£i áº£nh lÃªn.');
       }
     },
     [showToast],
@@ -450,26 +499,26 @@ const ImportMaterialPage: React.FC = () => {
     const errors: string[] = [];
 
     if (!form.ProjectID) {
-      errors.push('Vui lòng chọn dự án.');
+      errors.push('Vui lÃ²ng chá»n dá»± Ã¡n.');
     }
     if (!form.TypeTrackingBillID) {
-      errors.push('Vui lòng chọn loại vật tư.');
+      errors.push('Vui lÃ²ng chá»n loáº¡i váº­t tÆ°.');
     }
     if (!form.DeliveryVehicleID) {
-      errors.push('Vui lòng chọn phương tiện vận chuyển.');
+      errors.push('Vui lÃ²ng chá»n phÆ°Æ¡ng tiá»‡n váº­n chuyá»ƒn.');
     }
     if (!form.TitleBill) {
-      errors.push('Không thể tạo tiêu đề phiếu. Vui lòng làm mới và thử lại.');
+      errors.push('KhÃ´ng thá»ƒ táº¡o tiÃªu Ä‘á» phiáº¿u. Vui lÃ²ng lÃ m má»›i vÃ  thá»­ láº¡i.');
     }
     if (!form.Amount || form.Amount <= 0) {
-      errors.push('Số lượng phải lớn hơn 0.');
+      errors.push('Sá»‘ lÆ°á»£ng pháº£i lá»›n hÆ¡n 0.');
     }
 
     const hasInboundImage = inboundSlots.some(
       (slot) => images[slot.key].publicPath && images[slot.key].publicPath !== '',
     );
     if (!hasInboundImage) {
-      errors.push('Vui lòng chụp ít nhất một ảnh vật tư.');
+      errors.push('Vui lÃ²ng chá»¥p Ã­t nháº¥t má»™t áº£nh váº­t tÆ°.');
     }
 
     return errors;
@@ -507,7 +556,7 @@ const ImportMaterialPage: React.FC = () => {
 
       const result = await createTrackingBill(payload);
       if (result) {
-        showToast('Đã lưu phiếu nhập thành công.', 'success');
+        showToast('ÄÃ£ lÆ°u phiáº¿u nháº­p thÃ nh cÃ´ng.', 'success');
         resetImages();
         setForm((prev) => ({
           ...prev,
@@ -520,10 +569,10 @@ const ImportMaterialPage: React.FC = () => {
         setIsFirstTitleFetch(true);
         await refreshTitle(true);
       } else {
-        showToast('Máy chủ trả về phản hồi trống.');
+        showToast('MÃ¡y chá»§ tráº£ vá» pháº£n há»“i trá»‘ng.');
       }
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Không thể lưu phiếu nhập.');
+      showToast(error instanceof Error ? error.message : 'KhÃ´ng thá»ƒ lÆ°u phiáº¿u nháº­p.');
     } finally {
       setSubmitting(false);
     }
@@ -531,113 +580,52 @@ const ImportMaterialPage: React.FC = () => {
 
   const renderImageCard = (slot: ImageSlot, label: string) => {
     const state = images[slot];
-    const hasUpload = state.publicPath && state.publicPath !== '';
+    const hasUpload = Boolean(state.publicPath);
     const slotNumber = slot.replace('ImageIn', '');
 
     return (
-      <div key={slot} style={{
-        background: '#ffffff',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0',
-        padding: '16px',
-        boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)'
-      }}>
+      <div key={slot} className="image-card">
         <IonText>
-          <p style={{
-            margin: '0 0 12px',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#0f172a'
-          }}>
-            Ảnh {slotNumber}
-          </p>
+          <p className="image-card__title">Ảnh {slotNumber}</p>
         </IonText>
-        
-        <div
-          style={{
-            width: '100%',
-            height: '200px',
-            borderRadius: '10px',
-            border: state.previewUrl ? 'none' : '2px dashed #cbd5e1',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
-            background: state.previewUrl ? '#000' : '#f8fafc',
-            position: 'relative',
-            marginBottom: '12px'
-          }}
-        >
+
+        <div className={`image-card__media${state.previewUrl ? ' image-card__media--preview' : ''}`}>
           {state.uploading ? (
-            <div style={{ textAlign: 'center' }}>
+            <div className="image-card__state">
               <IonSpinner color="primary" />
-              <p style={{ 
-                margin: '8px 0 0', 
-                fontSize: '13px', 
-                color: '#64748b' 
-              }}>
-                Đang tải lên...
-              </p>
+              <p className="image-card__state-text">Đang tải lên...</p>
             </div>
           ) : state.previewUrl ? (
             <>
-              <img
-                src={state.previewUrl ?? ''}
-                alt={label}
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'contain' 
-                }}
-              />
+              <img src={state.previewUrl} alt={label} className="image-card__preview" />
               <IonButton
+                className="image-card__remove"
                 fill="solid"
                 color="light"
                 size="small"
                 onClick={() => handleRemoveImage(slot)}
-                style={{
-                  position: 'absolute',
-                  top: '8px',
-                  right: '8px',
-                  '--border-radius': '8px',
-                  opacity: 0.95
-                }}
               >
                 <IonIcon icon={closeCircleOutline} />
               </IonButton>
             </>
           ) : hasUpload ? (
-            <div style={{ textAlign: 'center', color: '#10b981' }}>
-              <IonIcon 
-                icon={cameraOutline} 
-                style={{ fontSize: '32px', marginBottom: '8px' }} 
-              />
-              <p style={{ margin: 0, fontSize: '13px', fontWeight: '500' }}>
-                Đã tải lên
-              </p>
+            <div className="image-card__state image-card__state--success">
+              <IonIcon icon={checkmarkCircleOutline} className="image-card__state-icon" />
+              <p className="image-card__state-text">Đã tải lên</p>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', color: '#94a3b8' }}>
-              <IonIcon 
-                icon={cameraOutline} 
-                style={{ fontSize: '32px', marginBottom: '8px' }} 
-              />
-              <p style={{ margin: 0, fontSize: '13px' }}>
-                Chưa có ảnh
-              </p>
+            <div className="image-card__state image-card__state--empty">
+              <IonIcon icon={cameraOutline} className="image-card__state-icon" />
+              <p className="image-card__state-text">Chưa có ảnh</p>
             </div>
           )}
         </div>
 
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px', 
-          flexDirection: 'column'
-        }}>
+        <div className="image-card__actions">
           <IonButton
+            className="image-card__button image-card__button--primary"
             expand="block"
             color="primary"
-            size="default"
             disabled={state.uploading}
             onClick={() =>
               setCaptureConfig({
@@ -645,29 +633,17 @@ const ImportMaterialPage: React.FC = () => {
                 title: form.TitleBill || 'Nhập vật tư',
               })
             }
-            style={{
-              '--border-radius': '10px',
-              height: '44px',
-              fontSize: '14px',
-              fontWeight: '600'
-            }}
           >
             <IonIcon icon={cameraOutline} slot="start" />
             Chụp ảnh
           </IonButton>
           <IonButton
+            className="image-card__button image-card__button--outline"
             expand="block"
             fill="outline"
             color="medium"
-            size="default"
             disabled={state.uploading}
             onClick={() => handleTriggerCapture(slot)}
-            style={{
-              '--border-radius': '10px',
-              height: '44px',
-              fontSize: '14px',
-              fontWeight: '600'
-            }}
           >
             Chọn từ thiết bị
           </IonButton>
@@ -694,7 +670,11 @@ const ImportMaterialPage: React.FC = () => {
           </IonButtons>
           <IonTitle>Nhập vật tư</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => void refreshTitle(true)} disabled={titleLoading}>
+            <IonButton
+              onClick={() => void refreshTitle(true)}
+              disabled={titleLoading}
+              aria-label="Làm mới tiêu đề"
+            >
               <IonIcon icon={refreshOutline} />
             </IonButton>
           </IonButtons>
@@ -702,79 +682,35 @@ const ImportMaterialPage: React.FC = () => {
         {(lookupsLoading || titleLoading || submitting) && <IonProgressBar type="indeterminate" />}
       </IonHeader>
 
-      <IonContent fullscreen style={{ '--background': '#f8fafc' }}>
+      <IonContent fullscreen className="import-page">
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Nhập vật tư</IonTitle>
           </IonToolbar>
         </IonHeader>
 
-        <div className="ion-padding" style={{ paddingBottom: '100px', maxWidth: '1200px', margin: '0 auto' }}>
-          {/* Header Section */}
-          <div style={{
-            background: 'linear-gradient(135deg, #e8f1ff 0%, #f8fbff 100%)',
-            borderRadius: '16px',
-            padding: '24px 20px',
-            marginBottom: '20px',
-            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)'
-          }}>
-            <IonText>
-              <h1 style={{
-                fontSize: '20px',
-                fontWeight: '700',
-                margin: '0 0 8px',
-                color: '#0f172a'
-              }}>
-                Tạo phiếu nhập vật tư
-              </h1>
-              <p style={{
-                margin: '0',
-                color: '#475569',
-                fontSize: '14px',
-                lineHeight: '1.5'
-              }}>
-                Điền thông tin và chụp ảnh vật tư để tạo phiếu nhập kho
-              </p>
-            </IonText>
+        <div className="import-page__container">
+          <div className="import-page__hero">
+            <h1 className="import-page__hero-title">Tạo phiếu nhập vật tư</h1>
+            <p className="import-page__hero-subtitle">
+              Điền thông tin và chụp ảnh vật tư để tạo phiếu nhập kho nhanh chóng, chính xác.
+            </p>
           </div>
 
-          {/* Form Card */}
-          <IonCard style={{
-            margin: '0 0 16px',
-            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0'
-          }}>
-            <IonCardContent style={{ padding: '24px' }}>
+          <IonCard className="import-card">
+            <IonCardContent className="import-card__content">
               <IonText>
-                <h2 style={{
-                  fontSize: '17px',
-                  fontWeight: '600',
-                  margin: '0 0 20px',
-                  color: '#0f172a',
-                  letterSpacing: '-0.01em'
-                }}>
-                  Thông tin phiếu
-                </h2>
+                <h2 className="import-card__title">Thông tin phiếu</h2>
               </IonText>
 
-              <IonItem lines="none" style={{ 
-                '--background': '#f8fafc',
-                '--padding-start': '16px',
-                '--inner-padding-end': '16px',
-                borderRadius: '12px',
-                marginBottom: '16px'
-              }}>
-                <IonLabel position="stacked" style={{ 
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0f172a'
-                }}>
-                  Dự án <span style={{ color: '#dc2626' }}>*</span>
+              <IonItem lines="none" className="form-field">
+                <IonLabel position="stacked" className="form-field__label">
+                  Dự án <span className="form-field__required">*</span>
                 </IonLabel>
                 <IonSelect
-                  interface="popover"
+                  className="form-field__control"
+                  interface={selectInterface}
+                  interfaceOptions={selectInterfaceOptions}
                   placeholder="Chọn dự án"
                   value={form.ProjectID ?? ''}
                   onIonChange={(event) =>
@@ -783,12 +719,6 @@ const ImportMaterialPage: React.FC = () => {
                       ProjectID: toOptionalNumber(event.detail.value),
                     }))
                   }
-                  style={{ 
-                    '--padding-start': '0',
-                    '--padding-end': '0',
-                    fontWeight: '500',
-                    color: '#0f172a'
-                  }}
                 >
                   <IonSelectOption value="">Chưa chọn</IonSelectOption>
                   {projectOptions.map((option) => (
@@ -799,23 +729,14 @@ const ImportMaterialPage: React.FC = () => {
                 </IonSelect>
               </IonItem>
 
-              <IonItem lines="none" style={{ 
-                '--background': '#f8fafc',
-                '--padding-start': '16px',
-                '--inner-padding-end': '16px',
-                borderRadius: '12px',
-                marginBottom: '16px'
-              }}>
-                <IonLabel position="stacked" style={{ 
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0f172a'
-                }}>
-                  Loại vật tư <span style={{ color: '#dc2626' }}>*</span>
+              <IonItem lines="none" className="form-field">
+                <IonLabel position="stacked" className="form-field__label">
+                  Loại vật tư <span className="form-field__required">*</span>
                 </IonLabel>
                 <IonSelect
-                  interface="popover"
+                  className="form-field__control"
+                  interface={selectInterface}
+                  interfaceOptions={selectInterfaceOptions}
                   placeholder="Chọn loại vật tư"
                   value={form.TypeTrackingBillID ?? ''}
                   onIonChange={(event) =>
@@ -824,12 +745,6 @@ const ImportMaterialPage: React.FC = () => {
                       TypeTrackingBillID: toOptionalNumber(event.detail.value),
                     }))
                   }
-                  style={{ 
-                    '--padding-start': '0',
-                    '--padding-end': '0',
-                    fontWeight: '500',
-                    color: '#0f172a'
-                  }}
                 >
                   <IonSelectOption value="">Chưa chọn</IonSelectOption>
                   {trackingTypeOptions.map((option) => (
@@ -840,32 +755,17 @@ const ImportMaterialPage: React.FC = () => {
                 </IonSelect>
               </IonItem>
 
-              <IonItem lines="none" style={{ 
-                '--background': '#f8fafc',
-                '--padding-start': '16px',
-                '--inner-padding-end': '16px',
-                borderRadius: '12px',
-                marginBottom: '16px'
-              }}>
-                <IonLabel position="stacked" style={{ 
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0f172a'
-                }}>
-                  Phương tiện vận chuyển <span style={{ color: '#dc2626' }}>*</span>
+              <IonItem lines="none" className="form-field">
+                <IonLabel position="stacked" className="form-field__label">
+                  Phương tiện vận chuyển <span className="form-field__required">*</span>
                 </IonLabel>
                 <IonSelect
-                  interface="popover"
+                  className="form-field__control"
+                  interface={selectInterface}
+                  interfaceOptions={selectInterfaceOptions}
                   placeholder="Chọn phương tiện"
                   value={form.DeliveryVehicleID ?? ''}
                   onIonChange={(event) => handleDeliverySelect(event.detail.value)}
-                  style={{ 
-                    '--padding-start': '0',
-                    '--padding-end': '0',
-                    fontWeight: '500',
-                    color: '#0f172a'
-                  }}
                 >
                   <IonSelectOption value="">Chưa chọn</IonSelectOption>
                   {deliveryVehicleOptions.map((option) => (
@@ -876,98 +776,41 @@ const ImportMaterialPage: React.FC = () => {
                 </IonSelect>
               </IonItem>
 
-              <div style={{
-                background: '#e0f2fe',
-                border: '1px solid #bae6fd',
-                borderRadius: '12px',
-                padding: '16px',
-                marginBottom: '16px'
-              }}>
+              <div className="import-tip">
                 <IonText>
-                  <p style={{
-                    margin: '0 0 4px',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    color: '#0369a1',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>
-                    Tiêu đề phiếu
-                  </p>
-                  <p style={{
-                    margin: 0,
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    color: '#0c4a6e',
-                    lineHeight: '1.5'
-                  }}>
+                  <p className="import-tip__title">Tiêu đề phiếu</p>
+                  <p className="import-tip__value">
                     {titleLoading ? 'Đang tạo tiêu đề...' : form.TitleBill || 'Chưa có tiêu đề'}
                   </p>
                 </IonText>
               </div>
 
-              <IonItem lines="none" style={{ 
-                '--background': '#f8fafc',
-                '--padding-start': '16px',
-                '--inner-padding-end': '16px',
-                borderRadius: '12px'
-              }}>
-                <IonLabel position="stacked" style={{ 
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0f172a'
-                }}>
-                  Số lượng <span style={{ color: '#dc2626' }}>*</span>
+              <IonItem lines="none" className="form-field">
+                <IonLabel position="stacked" className="form-field__label">
+                  Số lượng <span className="form-field__required">*</span>
                 </IonLabel>
                 <IonInput
+                  className="form-field__control"
                   type="number"
                   inputmode="decimal"
                   value={amountText}
                   placeholder="0"
                   onIonChange={(event) => handleAmountChange(event.detail.value)}
-                  style={{ 
-                    '--padding-start': '0',
-                    '--padding-end': '0',
-                    fontWeight: '500',
-                    color: '#0f172a',
-                    fontSize: '15px'
-                  }}
                 />
               </IonItem>
             </IonCardContent>
           </IonCard>
 
-          {/* Photos Card */}
-          <IonCard style={{
-            margin: '0',
-            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0'
-          }}>
-            <IonCardContent style={{ padding: '24px' }}>
+          <IonCard className="import-card import-card--photos">
+            <IonCardContent className="import-card__content import-card__content--photos">
               <IonText>
-                <h2 style={{
-                  fontSize: '17px',
-                  fontWeight: '600',
-                  margin: '0 0 4px',
-                  color: '#0f172a',
-                  letterSpacing: '-0.01em'
-                }}>
-                  Hình ảnh vật tư
-                </h2>
-                <p style={{
-                  margin: '0 0 20px',
-                  fontSize: '13px',
-                  color: '#64748b'
-                }}>
-                  Tối thiểu 1 ảnh, tối đa 3 ảnh
-                </p>
+                <h2 className="import-card__title">Hình ảnh vật tư</h2>
+                <p className="import-card__description">Tối thiểu 1 ảnh, tối đa 3 ảnh</p>
               </IonText>
-              <IonGrid style={{ padding: 0 }}>
+              <IonGrid className="image-grid">
                 <IonRow>
                   {inboundSlots.map(({ key, label }) => (
-                    <IonCol size="12" sizeMd="6" sizeLg="4" key={key} style={{ padding: '0 8px 16px' }}>
+                    <IonCol size="12" sizeMd="6" sizeLg="4" key={key} className="image-grid__col">
                       {renderImageCard(key, label)}
                     </IonCol>
                   ))}
@@ -978,34 +821,22 @@ const ImportMaterialPage: React.FC = () => {
         </div>
       </IonContent>
 
-      <IonFooter style={{
-        boxShadow: '0 -4px 12px rgba(15, 23, 42, 0.06)',
-        borderTop: '1px solid #e2e8f0'
-      }}>
-        <IonToolbar style={{ '--background': '#ffffff', padding: '8px 16px' }}>
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            justifyContent: 'flex-end',
-            maxWidth: '1200px',
-            margin: '0 auto'
-          }}>
-            <IonButton 
-              fill="clear" 
-              color="medium" 
+      <IonFooter className="import-footer">
+        <IonToolbar className="import-footer__toolbar">
+          <div className="import-footer__actions">
+            <IonButton
+              className="import-footer__button import-footer__button--secondary"
+              fill="clear"
+              color="medium"
               routerLink="/app/applications"
-              style={{ '--border-radius': '12px' }}
             >
               Hủy
             </IonButton>
-            <IonButton 
-              color="primary" 
-              disabled={submitting} 
+            <IonButton
+              className="import-footer__button import-footer__button--primary"
+              color="primary"
+              disabled={submitting}
               onClick={() => void handleSubmit()}
-              style={{
-                '--border-radius': '12px',
-                fontWeight: '600'
-              }}
             >
               {submitting ? <IonSpinner slot="start" /> : <IonIcon icon={saveOutline} slot="start" />}
               Lưu phiếu
@@ -1032,3 +863,5 @@ const ImportMaterialPage: React.FC = () => {
 };
 
 export default ImportMaterialPage;
+
+
